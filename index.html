@@ -177,7 +177,84 @@
             </div>
 
         <button class="btn-generate" onclick="generateFiveLottoSets()">새로운 번호 뽑기</button>
+
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--row-bg);">
+
+        <div class="contact-section">
+            <h2>🤝 제휴 문의</h2>
+            <p class="desc">서비스 제휴 및 기타 문의사항을 남겨주세요.</p>
+            <form action="https://formspree.io/f/xrevgaro" method="POST" class="contact-form">
+                <div class="form-group">
+                    <label for="email">이메일 주소</label>
+                    <input type="email" id="email" name="email" required placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="message">문의 내용</label>
+                    <textarea id="message" name="message" required placeholder="문의하실 내용을 입력해주세요."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">문의하기</button>
+            </form>
+        </div>
     </div>
+
+    <style>
+        .contact-section {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .contact-section h2 {
+            color: var(--h1-color);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: var(--label-color);
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group textarea {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--row-bg);
+            background-color: var(--row-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--h1-color);
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .btn-submit {
+            background-color: var(--h1-color);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+    </style>
 
     <script>
         // 테마 토글 기능
