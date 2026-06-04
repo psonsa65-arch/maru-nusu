@@ -1,14 +1,263 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>행운의 로또 번호 추천기</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #f4f7f6;
+            --container-bg: #fff;
+            --text-color: #333;
+            --h1-color: #1a5c96;
+            --desc-color: #666;
+            --row-bg: #f8f9fa;
+            --label-color: #555;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        [data-theme='dark'] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --h1-color: #4a9eff;
+            --desc-color: #aaa;
+            --row-bg: #3d3d3d;
+            --label-color: #ccc;
+            --shadow: rgba(0,0,0,0.5);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 2px solid var(--h1-color);
+            color: var(--h1-color);
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--h1-color);
+            color: #fff;
+        }
+
+        h1 {
+            color: var(--h1-color);
+            margin-bottom: 10px;
+        }
+
+        p.desc {
+            color: var(--desc-color);
+            margin-bottom: 30px;
+        }
+
+        .lotto-board {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .lotto-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--row-bg);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .row-label {
+            font-weight: bold;
+            color: var(--label-color);
+            margin-right: 10px;
+            width: 50px;
+        }
+
+        .ball {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.2), 0 3px 5px rgba(0,0,0,0.1);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* 로또 공 색상 규격 */
+        .color-yellow { background-color: #fbc400; color: #333; text-shadow: none; } /* 1~10 */
+        .color-blue { background-color: #69c8f2; }   /* 11~20 */
+        .color-red { background-color: #ff7272; }    /* 21~30 */
+        .color-gray { background-color: #aaaaaa; }   /* 31~40 */
+        .color-green { background-color: #b0d840; color: #333; text-shadow: none; } /* 41~45 */
+
+        .btn-generate {
+            background-color: var(--h1-color);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-generate:hover {
+            opacity: 0.9;
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 480px) {
+            .ball {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            .lotto-row {
+                gap: 5px;
+                padding: 10px;
+            }
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1 id="greeting">Hello, world!</h1>
-  <button id="colorButton">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+
+    <div class="container">
+        <button class="theme-toggle" id="theme-toggle">다크 모드</button>
+        <h1>🍀 행운의 로또 번호 추천기</h1>
+        <p class="desc">이번 주 행운의 주인공은 바로 당신입니다!</p>
+
+        <div class="lotto-board" id="lotto-board">
+            </div>
+
+        <button class="btn-generate" onclick="generateFiveLottoSets()">새로운 번호 뽑기</button>
+    </div>
+
+    <script>
+        // 테마 토글 기능
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                themeToggle.textContent = '다크 모드';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '라이트 모드';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // 로컬 스토리지에서 테마 불러오기
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '라이트 모드';
+        }
+
+        // 번호에 맞는 색상 클래스를 반환하는 함수
+        function getBallColorClass(number) {
+            if (number <= 10) return 'color-yellow';
+            if (number <= 20) return 'color-blue';
+            if (number <= 30) return 'color-red';
+            if (number <= 40) return 'color-gray';
+            return 'color-green';
+        }
+
+        // 1게임(6개 번호)을 생성하는 함수
+        function generateSingleLotto() {
+            const numbers = new Set();
+            while (numbers.size < 6) {
+                const randomNum = Math.floor(Math.random() * 45) + 1;
+                numbers.add(randomNum);
+            }
+            // 오름차순 정렬
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        // 5게임을 생성하고 화면에 그려주는 함수
+        function generateFiveLottoSets() {
+            const board = document.getElementById('lotto-board');
+            board.innerHTML = ''; // 기존 번호 초기화
+            
+            const labels = ['A', 'B', 'C', 'D', 'E'];
+
+            for (let i = 0; i < 5; i++) {
+                const lottoNumbers = generateSingleLotto();
+                
+                // 각 게임(행)의 컨테이너 생성
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'lotto-row';
+                
+                // A, B, C, D, E 라벨 추가
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'row-label';
+                labelDiv.textContent = labels[i] + ' 자동';
+                rowDiv.appendChild(labelDiv);
+
+                // 6개의 공 생성
+                lottoNumbers.forEach(num => {
+                    const ballDiv = document.createElement('div');
+                    ballDiv.className = `ball ${getBallColorClass(num)}`;
+                    ballDiv.textContent = num;
+                    rowDiv.appendChild(ballDiv);
+                });
+
+                board.appendChild(rowDiv);
+            }
+        }
+
+        // 페이지 로드 시 최초 1회 실행
+        window.onload = generateFiveLottoSets;
+    </script>
+
 </body>
 </html>
